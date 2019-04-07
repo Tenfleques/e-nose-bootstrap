@@ -1,4 +1,4 @@
-version: '2'
+version: '3.7'
 services:
   zookeeper:
     image: 'bitnami/zookeeper:latest'
@@ -34,7 +34,13 @@ services:
     depends_on:
       - node
       - kafka
-  ts_server:
+    deploy:
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+  ts-server:
     image: 'tensorflow/serving:latest'
     container_name: vguit.enose.ts.serving
     command: --model_config_file=/models/models.config
