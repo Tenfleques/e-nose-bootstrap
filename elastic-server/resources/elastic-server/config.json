@@ -1,9 +1,0 @@
-{
-    "brokers" : ["kafka:9092"],
-    "topic" : "ru.vsuet.noses",
-    "restUrl" : "localhost",
-    "restPort" : "7070",
-    "redisUrl" : "redis",
-    "redisPort" : "6379",
-    "redisPass" : "password"
-  }
