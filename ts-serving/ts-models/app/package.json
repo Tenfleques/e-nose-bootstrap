@@ -1,0 +1,9 @@
+{
+    "name": "e-nose-models-server",
+    "description": "The server to advertise the available models",
+    "version": "1.0.0",
+    "license": "http://flequesboard.com/licenses/enose/admin",
+    "scripts": {
+        "start": "node index.js"
+      }
+}

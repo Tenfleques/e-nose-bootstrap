@@ -1,0 +1,72 @@
+version: '3'
+services:
+  zookeeper:
+    container_name: vguit.enose.zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+  kafka:
+    container_name: vguit.enose.kafka
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      HOSTNAME_COMMAND: echo 192.168.1.3
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_CREATE_TOPICS: "ru.vsuet.noses"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - ./kafka/log/kafka-broker.sock:/var/run/docker.sock
+  redis:
+    image: 'redis:latest'
+    ports: 
+      - '6379:6379'
+    volumes:
+      - ./redis/:/data
+    container_name: vguit.enose.redis
+  enose:
+    build: 
+      context: ./elastic-server/
+      dockerfile: Dockerfile
+    image: turndai/enose:latest
+    ports:
+      - '7070:7070'
+    container_name: vguit.enose
+  flask_corr:
+    build: 
+      context: ./flask/
+      dockerfile: Dockerfile
+    image: turndai/flask-nose-corr:latest
+    ports:
+      - '5000:5000'
+    container_name: vguit.enose.corr
+    volumes: 
+      - ./flask/app
+  ts-server:
+    build: 
+      context: ./ts-serving/
+      dockerfile: Dockerfile
+    container_name: vguit.enose.ts.serving
+    image: turndai/ts-serving-nose:latest
+    command: --model_config_file=/models/models.config
+    ports: 
+      - 8500:8500
+      - 8501:8501
+  node:
+    build: 
+      context: ./ts-serving/ts-models/
+      dockerfile: Dockerfile
+    container_name: vguit.enose.ts.models
+    image: turndai/ts-models-nose:latest
+    ports: 
+      - 8080:8080
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    expose:
+      - "8080"
+    command: "npm start"

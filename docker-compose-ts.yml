@@ -1,0 +1,12 @@
+version: '3'
+services:
+  ts-server:
+    image: 'tensorflow/serving:latest'
+    container_name: vguit.enose.ts.serving
+    #command: --model_config_file=/models/models.config
+    ports: 
+      - 8500:8500
+      - 8501:8501
+    volumes: 
+      - ./models:/models
+  
