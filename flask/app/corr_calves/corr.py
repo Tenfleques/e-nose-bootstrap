@@ -24,7 +24,7 @@ def corrsWithColumnsIn(x_data, y_data, corr_threshold =.7, join_key = u'ИНВ �
     df = pd.DataFrame(key_corrs_with)
     df = df.drop(diff_columns)
     threshold_filter = df[df.abs() > corr_threshold].any(axis = 1)
-    #print(threshold_filter)
+    
     return df[threshold_filter]
 
 def corrsWithColumnsCSV(data, cols, corr_threshold =.7):   
