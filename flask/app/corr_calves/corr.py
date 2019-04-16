@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*- 
 import pandas as pd
-import sys
-if sys.version_info[0] < 3: 
-    from StringIO import StringIO
-else:
-    from io import StringIO
+from io import StringIO
 
 def readData(path):
     in_data = pd.read_csv(path, encoding='utf8')
@@ -31,23 +27,27 @@ def corrsWithColumnsIn(x_data, y_data, corr_threshold =.7, join_key = u'ИНВ �
     #print(threshold_filter)
     return df[threshold_filter]
 
-def corrsWithColumnsCSV(data, cols, corr_threshold =.7):  
-    csv = StringIO(data)  
-    param_data = pd.read_csv(csv, encoding='utf8').dropna()
+def corrsWithColumnsCSV(data, cols, corr_threshold =.7):   
+    param_data = pd.read_csv(StringIO(data), encoding='utf8').dropna()
+    cols = param_data.columns 
 
-    #print(param_data)    
+    for key in cols:
+        param_data[key] = pd.to_numeric(param_data[key],errors="coerce", downcast='integer')
+
+    param_data  = param_data.dropna(axis=1).reset_index(drop=True)
+    cols = param_data.columns
+
     
-    key_corrs_with = {}
     key_corrs_with = param_data.corr()
-    #for key in cols:
-    #    key_corrs_with[key] = param_data.corrwith(param_data[key])
-        
+    
+    for key in cols:
+        key_corrs_with[key] = param_data.corrwith(param_data[key])
+        key_corrs_with[key][key] = 2.0
+    
     
     df = pd.DataFrame(key_corrs_with)
-    #df = df.drop(cols)
-    threshold_filter = df[df.abs() > corr_threshold].any(axis = 1)
-    #print(threshold_filter)
-    res = df[threshold_filter]
-    print(res)
     
-    return res
+    threshold_filter = df[df.abs() > corr_threshold].any(axis = 1)
+    df = df[threshold_filter]
+    df = df.replace(2.0, 1.0)
+    return df

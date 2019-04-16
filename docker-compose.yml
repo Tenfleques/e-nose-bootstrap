@@ -44,7 +44,7 @@ services:
       - '5000:5000'
     container_name: vguit.enose.corr
     volumes: 
-      - ./flask/app
+      - ./flask/app:/app 
   ts-server:
     build: 
       context: ./ts-serving/

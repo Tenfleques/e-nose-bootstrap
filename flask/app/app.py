@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 from flask import Flask
 from flask import request
 import decimal
@@ -10,7 +11,7 @@ app = Flask(__name__)
 @app.route('/')
 def hello_world():
     return 'Correlation analysis server'
-'''
+
 @app.route('/corr/')
 def corrParam():
     b = request.args.get("target") or "fisiology"
@@ -30,25 +31,23 @@ def corrParam():
             x, 
             y, 
             mintr)
-    return json.dumps(data.to_dict(), ensure_ascii=False) '''   
+    return json.dumps(data.to_dict(), ensure_ascii=False)   
 
-@app.route('/corr/csv/')
+@app.route('/corr/csv/', methods = ['GET','POST'])
 def corrParamCSV():
-    b = request.args.get("target") or ""
-    b = b.split(",")
-    a = request.args.get("src")
-    mintr = request.args.get("mincorr") or .65
+    cols = request.form['target'] or ""
+    cols = cols.split(",")
+    data = request.form['src']
+    mintr = request.form['mincorr']or .65
+
     D = decimal.Decimal
     mintr = D(mintr)
 
-    #print(b)
     data = cr.corrsWithColumnsCSV(
-            a, 
-            b, 
-            mintr)
-    print("done")
-    return json.dumps(data, ensure_ascii=False)
-    #return "{'res': 'done'}"
+            data=data, 
+            cols=cols, 
+            corr_threshold=mintr)
+    return json.dumps(data.to_dict(), ensure_ascii=False)
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0')
