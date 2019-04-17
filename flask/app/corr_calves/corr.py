@@ -31,6 +31,7 @@ def corrsWithColumnsCSV(data, cols, corr_threshold =.7):
     param_data = pd.read_csv(StringIO(data), encoding='utf8').dropna()
     cols = param_data.columns 
 
+
     for key in cols:
         param_data[key] = pd.to_numeric(param_data[key],errors="coerce", downcast='integer')
 
@@ -47,7 +48,7 @@ def corrsWithColumnsCSV(data, cols, corr_threshold =.7):
     
     df = pd.DataFrame(key_corrs_with)
     
-    threshold_filter = df[df.abs() > corr_threshold].any(axis = 1)
+    threshold_filter = df[(corr_threshold < df.abs()) & (df.abs() <= 1.0)].any(axis = 1)
     df = df[threshold_filter]
     df = df.replace(2.0, 1.0)
     return df

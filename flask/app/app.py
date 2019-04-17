@@ -2,6 +2,10 @@
 from flask import Flask
 from flask import request
 import decimal
+import pandas as pd
+import numpy as np
+import io
+import ast
 
 import corr_calves.corr as cr
 import json
@@ -32,6 +36,12 @@ def corrParam():
             y, 
             mintr)
     return json.dumps(data.to_dict(), ensure_ascii=False)   
+@app.route('/corr/plot/bar', methods = ['GET','POST'])
+def corrParamImage():
+    src = request.form['src'] or ""
+    dict_in = ast.literal_eval(src)
+
+    #return pd.DataFrame(dict_in).plot.bar()
 
 @app.route('/corr/csv/', methods = ['GET','POST'])
 def corrParamCSV():
